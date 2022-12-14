@@ -21,12 +21,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
     Button start,stop,play;
@@ -107,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 MediaPlayer mediaPlayer = new MediaPlayer();
 
                 try {
-                    mediaPlayer.setDataSource(file+"/sunil2.3gp");
+                    mediaPlayer.setDataSource(file+"/sunil2.mp3");
                     mediaPlayer.prepare();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -143,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             file.mkdirs();
         }
 
-        String file_name=file+"/sunil2"+".3gp";
+        String file_name=file+"/sunil2"+".mp3";
         rec.setOutputFile(file_name);
 
         try {
@@ -155,6 +162,15 @@ public class MainActivity extends AppCompatActivity {
         }
         rec.start();
         Toast.makeText(MainActivity.this,"Record started",Toast.LENGTH_SHORT).show();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                sendAudio(file_name);
+
+            }
+        }, 60000);
 
     }
 
@@ -165,26 +181,43 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void sendAudio() {
-        // RequestQueue initialized
-        mRequestQueue = Volley.newRequestQueue(this);
+    private void sendAudio(String selectedPath) {
+        try{
 
-        // String Request initialized
-        mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
 
-                Toast.makeText(getApplicationContext(), "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("Error :", "Error :" + error.toString());
-            }
-        });
 
-        mRequestQueue.add(mStringRequest);
+            File file=new File(selectedPath);
+
+            RequestParams params = new RequestParams();
+            params.put("audio",file);
+            Log.i("Api called :",file.toString());
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.post(url, params,new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+
+
+                    String s=new String(responseBody);
+                    Toast.makeText(MainActivity.this,s,Toast.LENGTH_LONG).show();
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+                    Toast.makeText(MainActivity.this,error.toString(),Toast.LENGTH_LONG).show();
+                    Log.i("Api called :",error.toString());
+
+                }
+            });
+
+        }
+        catch (Exception e)
+        {
+
+        }
     }
+
 
 
 
