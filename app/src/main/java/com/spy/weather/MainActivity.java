@@ -5,7 +5,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -25,6 +27,9 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -36,15 +41,15 @@ import java.util.TimerTask;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
-    Button start,stop,play;
-    private MediaRecorder rec;
+    Button start,stop,play,online;
+
     final Handler handler = new Handler();
     Timer timer = new Timer();
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
-    private RequestQueue mRequestQueue;
-    private StringRequest mStringRequest;
-    private String url = "http://faldukan.com/weather/saveAudio.php";
 
+    private String url = "http://faldukan.com/weather/saveAudio.php";
+    MediaPlayer mediaPlayer;
+    private MediaRecorder rec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,28 +67,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (CheckPermissions()) {
 
-
-
-
-
-                    TimerTask doAsynchronousTask = new TimerTask() {
-                        @Override
-                        public void run() {
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    try {
-
-                                        record();
-                                    } catch (Exception e) {
-                                    }
-                                }
-                            });
-                        }
-                    };
-                    timer.schedule(doAsynchronousTask, 0, 60000);
-
-
-
+                    startService();
 
 
 
@@ -98,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                    stop();
+                stopService();
 
             }
         });
@@ -111,15 +95,15 @@ public class MainActivity extends AppCompatActivity {
                 String file_path=getApplicationContext().getFilesDir().getPath();
 
                 File file= new File(file_path);
-                MediaPlayer mediaPlayer = new MediaPlayer();
+                MediaPlayer mediaPlayerr = new MediaPlayer();
 
                 try {
-                    mediaPlayer.setDataSource(file+"/sunil2.mp3");
-                    mediaPlayer.prepare();
+                    mediaPlayerr.setDataSource(file+"/weather1.mp3");
+                    mediaPlayerr.prepare();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                mediaPlayer.start();
+                mediaPlayerr.start();
 
             }
         });
@@ -129,96 +113,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void record(){
-        String file_path=getApplicationContext().getFilesDir().getPath();
 
-        File file= new File(file_path);
-
-        Long date=new Date().getTime();
-        Date current_time = new Date(Long.valueOf(date));
-
-        rec=new MediaRecorder();
-
-        rec.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-        rec.setAudioChannels(1);
-        rec.setAudioSamplingRate(8000);
-        rec.setAudioEncodingBitRate(44100);
-        rec.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        rec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        if (!file.exists()){
-            file.mkdirs();
-        }
-
-        String file_name=file+"/sunil2"+".mp3";
-        rec.setOutputFile(file_name);
-
-        try {
-            rec.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(MainActivity.this,"Sorry! file creation failed!"+e.getMessage(),Toast.LENGTH_SHORT).show();
-            return;
-        }
-        rec.start();
-        Toast.makeText(MainActivity.this,"Record started",Toast.LENGTH_SHORT).show();
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                sendAudio(file_name);
-
-            }
-        }, 60000);
-
+    public void startService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android");
+        ContextCompat.startForegroundService(this, serviceIntent);
     }
-
-    public void stop(){
-        rec.stop();
-        rec.reset();
+    public void stopService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        stopService(serviceIntent);
     }
-
-
-
-    private void sendAudio(String selectedPath) {
-        try{
-
-
-
-            File file=new File(selectedPath);
-
-            RequestParams params = new RequestParams();
-            params.put("audio",file);
-            Log.i("Api called :",file.toString());
-            AsyncHttpClient client = new AsyncHttpClient();
-            client.post(url, params,new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-
-
-                    String s=new String(responseBody);
-                    Toast.makeText(MainActivity.this,s,Toast.LENGTH_LONG).show();
-
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
-                    Toast.makeText(MainActivity.this,error.toString(),Toast.LENGTH_LONG).show();
-                    Log.i("Api called :",error.toString());
-
-                }
-            });
-
-        }
-        catch (Exception e)
-        {
-
-        }
-    }
-
-
 
 
 
@@ -246,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
         // this method is used to check permission
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int result1 = ContextCompat.checkSelfPermission(getApplicationContext(),  Manifest.permission.RECORD_AUDIO);
-        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED ;
     }
 
     private void RequestPermissions() {

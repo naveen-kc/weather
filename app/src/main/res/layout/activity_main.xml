@@ -6,16 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <Button
+        android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.442"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/start"/>
-
+        app:layout_constraintVertical_bias="0.253" />
 
     <Button
         android:id="@+id/stop"
@@ -24,11 +26,10 @@
         android:text="stop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.442"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.685" />
-
+        app:layout_constraintVertical_bias="0.472" />
 
     <Button
         android:id="@+id/play"
@@ -37,9 +38,9 @@
         android:text="play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.442"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.834" />
+        app:layout_constraintVertical_bias="0.693" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
