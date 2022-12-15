@@ -77,7 +77,7 @@ public class ForegroundService extends Service {
                 .build();
         startForeground(1, notification);
 
-        //start();
+
 
 
 
@@ -151,7 +151,6 @@ public class ForegroundService extends Service {
                     try{
 
                         rec.stop();
-                        //rec.release();
                         rec.reset();
                         sendAudio(file_name);
                     }catch(RuntimeException ex){
@@ -238,8 +237,18 @@ public class ForegroundService extends Service {
     }
 
 
+    void stopRecord() {
+        if (null != rec) {
+            try {
+
+                rec.stop();
+                rec.reset();
+            } catch (RuntimeException ex) {
+                Log.i("ApiCalled", "in catch of save audio0000" + ex.toString());
+            }
+        }
 
 
-
+    }
 
 }

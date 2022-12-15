@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
     public void stopService() {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
+        ForegroundService f =new ForegroundService();
+        f.stopRecord();
     }
 
 
