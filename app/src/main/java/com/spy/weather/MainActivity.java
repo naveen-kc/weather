@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -117,13 +118,14 @@ public class MainActivity extends AppCompatActivity {
     public void startService() {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android");
+        serviceIntent.setAction("StartService");
         ContextCompat.startForegroundService(this, serviceIntent);
     }
     public void stopService() {
-        Intent serviceIntent = new Intent(this, ForegroundService.class);
-        stopService(serviceIntent);
-        ForegroundService f =new ForegroundService();
-        f.stopRecord();
+        Intent intent = new Intent(getApplicationContext(), ForegroundService.class);
+        intent.setAction("StopService");
+        ContextCompat.startForegroundService(getApplicationContext(), intent);
+
     }
 
 

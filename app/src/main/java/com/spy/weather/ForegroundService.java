@@ -64,18 +64,27 @@ public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.i("Location :","onStartCommand CALLED IN SERVICE ");
-        String input = intent.getStringExtra("inputExtra");
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service")
-                .setContentText(input)
-                .setContentIntent(pendingIntent)
-                .build();
-        startForeground(1, notification);
+
+        if (intent.getAction().equals("StopService")) {
+            stopForeground(true);
+            stopSelf();
+            stopRecord();
+        }else{
+            Log.i("Location :","onStartCommand CALLED IN SERVICE ");
+            String input = intent.getStringExtra("inputExtra");
+            createNotificationChannel();
+            Intent notificationIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                    0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle("Foreground Service")
+                    .setContentText(input)
+                    .setContentIntent(pendingIntent)
+                    .build();
+            startForeground(1, notification);
+
+        }
+
 
 
 
@@ -240,7 +249,7 @@ public class ForegroundService extends Service {
     void stopRecord() {
         if (null != rec) {
             try {
-
+                Log.i("ApiCalled", "recoerder stopped ");
                 rec.stop();
                 rec.reset();
             } catch (RuntimeException ex) {
